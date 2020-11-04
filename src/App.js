@@ -26,12 +26,11 @@ function shuffle(a) {
 function App() {
   const [ deck, setDeck ] = useState(generateDeck());
   const [ pickedCards, setPickedCards ] = useState([])
-  
-  function pickCard(cardIndex) {
+    
+  const pickCard = (cardIndex) => {
     if (deck[cardIndex].isFlipped) {
       return;
     }
-    console.log('picked', cardIndex);
     
     const cardToFlip = {...deck[cardIndex]};
     cardToFlip.isFlipped = true;
@@ -48,39 +47,37 @@ function App() {
     setPickedCards(newPickedCards);
   }
 
-  function unflipCards(card1Index, card2Index) {
-    console.log('unflipping', card1Index, card2Index);
-    const card1 =  {...deck[card1Index]};
-    const card2 =  {...deck[card2Index]};
-    card1.isFlipped = false;
-    card2.isFlipped = false;
-
-    const newDeck = deck.map((card, index) => {
-      if (card1Index === index) {
-        return card1;
-      }
-      if (card2Index === index) {
-        return card2;
-      }
-      return card;
-    })
-
-    setDeck(newDeck);
-  }
-
   useEffect(() => {
+    const unflipCards = (card1Index, card2Index) => {
+      const card1 =  {...deck[card1Index]};
+      const card2 =  {...deck[card2Index]};
+      card1.isFlipped = false;
+      card2.isFlipped = false;
+
+      setDeck((currDeck) => {
+        return currDeck.map((card, index) => {
+          if (card1Index === index) {
+            return card1;
+          }
+          if (card2Index === index) {
+            return card2;
+          }
+          return card;
+        })
+      })
+    }
+    
     if (pickedCards.length === 2) {
       const card1Index = pickedCards[0];
       const card2Index = pickedCards[1];
       if (deck[card1Index].symbol !== deck[card2Index].symbol) {
-        console.log('cards don\'t match')
         setTimeout(() => {
           unflipCards(card1Index, card2Index);
         }, 1000);
       }
-      setPickedCards([])
+      setPickedCards([]);
     }
-  }, [pickedCards]);
+  }, [pickedCards, deck]);
 
   const cardsJSX = deck.map((card, index) => {
     return <MemoryCard
@@ -98,11 +95,11 @@ function App() {
         <h3>Match cards to win</h3>
       </header>
       <div className="App-cards">
-          {cardsJSX.slice(0,4)}
-          {cardsJSX.slice(4,8)}
-          {cardsJSX.slice(8,12)}
-          {cardsJSX.slice(12,16)}
-        </div>
+        {cardsJSX.slice(0,4)}
+        {cardsJSX.slice(4,8)}
+        {cardsJSX.slice(8,12)}
+        {cardsJSX.slice(12,16)}
+      </div>
     </div>
   );
 }
